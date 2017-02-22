@@ -1,0 +1,133 @@
+doctype html
+/!if lt IE 7 ]><html class="ie ie6" lang="en">
+/!if IE 7 ]><html class="ie ie7" lang="en">
+/!if IE 8 ]><html class="ie ie8" lang="en">
+/! [if (gte IE 9)|!(IE)]><!--><html lang="en"> <!--<![endif]
+head
+  meta charset='utf-8'
+  title= content_for?(:title) ? (yield_content(:title)) : "#{Settings.site_name} - #{Settings.tagline}"
+  meta name='description' content=(content_for?(:description) ? yield_content(:description) : Settings.site_description)
+  meta name='keywords' content=(content_for?(:keywords) ? yield_content(:keywords) : Settings.site_keywords)
+
+  meta name='google-site-verification' content=Settings.google_site_verification
+
+  meta property='fb:app_id' content=Settings.facebook_app_id
+  meta property='og:site_name' content=Settings.site_name
+  meta property='og:title' content=(content_for?(:og_title) ? yield_content(:og_title) : "#{Settings.site_name} - #{Settings.tagline}")
+  meta property='og:description' content=(content_for?(:description) ? yield_content(:description) : Settings.site_description)
+  meta property='og:image' content=(content_for?(:og_image) ? yield_content(:og_image) : url('logo.png'))
+  meta property='og:url' content=(content_for?(:og_url) ? yield_content(:og_url) : request.url)
+
+  link rel='canonical' href=(content_for?(:og_url) ? yield_content(:og_url) : request.url)
+  link rel='dns-prefetch' href='//s3.amazonaws.com'
+
+  // Mobile Specific
+  meta(name='viewport' content='width=device-width, initial-scale=1, maximum-scale=1')
+  meta http-equiv="X-UA-Compatible" content="IE=edge"
+
+  // CSS
+  link rel="stylesheet" href='//fonts.googleapis.com/css?family=Open+Sans:400,700,800|Open+Sans+Condensed:300,700'
+  link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"
+
+  sass:
+    body:not(.embedded)
+      display: flex
+      flex-direction: column
+      min-height: 100vh
+      >#content
+        flex: 1
+
+    .form-actions
+      display: flex
+      flex-direction: row-reverse
+    .navbar
+      margin-bottom: 0
+
+    .navbar-brand
+      font-weight: lighter
+      font-style: italic
+      font-size: 32px
+    .list-group-item
+      background-color: #fafafa
+    .message-header
+      display: flex
+      .subject
+        flex: 1
+      .from, .date
+        flex-basis: 250px
+        overflow: hidden
+        text-overflow: ellipsis
+        white-space: nowrap
+      .date
+        flex-basis: 150px
+    .message-content
+      background: #fff
+    iframe
+      width: 100%
+      border: none
+
+  = yield_content :head
+
+body
+  header.navbar.navbar-default
+    .container
+      .navbar-header
+
+        button.navbar-toggle.pull-left data-target=".navbar-navigation" data-toggle="collapse" type="button"
+          span.sr-only Toggle navigation
+          span.fa.fa-bars
+
+        a.navbar-brand href='/'
+          /img src=url('logo-with-text.svg') alt="#{Settings.site_name} - #{Settings.tagline}" width=120 height=30
+          = Settings.site_name
+  - unless Sinatra::Base.production?
+  /span.badge= Sinatra::Base.environment.to_s.slice(3)
+
+  = yield_content :header
+
+  #content == yield
+
+
+  footer.navbar-default.navbar
+    .container
+      ul.nav.navbar-nav
+        li
+          a href="/"
+            | &copy; 2016 #{Settings.site_name}. #{Settings.site_location}
+        /li= link_to "About", "/pages/about"
+        /li= mail_to "support@#{Settings.mail_domain}", 'Contact', encode: 'javascript'
+      ul.nav.navbar-nav.navbar-right
+        li
+          a href="http://www.facebook.com/#{Settings.facebook_page_id}" target='_blank'
+            span.fa-stack.fa-lg
+              i.fa.fa-square-o.fa-stack-2x
+              i.fa.fa-facebook.fa-stack-1x
+        li
+          a href="http://www.twitter.com/#{Settings.twitter_id}" target='_blank'
+            span.fa-stack.fa-lg
+              i.fa.fa-square-o.fa-stack-2x
+              i.fa.fa-twitter.fa-stack-1x
+            /li= link_to "http://plus.google.com/#{Settings.google_plus_id}", target: '_blank' do
+            span.fa-stack.fa-lg
+              i.fa.fa-square-o.fa-stack-2x
+              i.fa.fa-google-plus.fa-stack-1x
+
+  script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"
+  script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"
+  //= javascript_include_tag 'application'
+  = yield_content :javascripts
+
+  /Google Analytics
+  /javascript:
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+              (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', '#{Settings.google_analytics}', '#{Settings.domain}');
+    ga('require', 'displayfeatures');
+    ga('send', 'pageview');
+
+    var heap=heap||[];heap.load=function(a){window._heapid=a;var b=document.createElement("script");b.type="text/javascript",b.async=!0,b.src=("https:"===document.location.protocol?"https:":"http:")+"//cdn.heapanalytics.com/js/heap.js";var c=document.getElementsByTagName("script")[0];c.parentNode.insertBefore(b,c);var d=function(a){return function(){heap.push([a].concat(Array.prototype.slice.call(arguments,0)))}},e=["identify","track"];for(var f=0;f<e.length;f++)heap[e[f]]=d(e[f])};
+    heap.load("#{Settings.heap}");
+

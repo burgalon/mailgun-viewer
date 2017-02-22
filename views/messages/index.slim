@@ -1,0 +1,22 @@
+.container
+  ul.list-group
+    - @messages.each_with_index do |message, i|
+      li.list-group-item data-toggle="collapse" data-target="#message-#{i}"
+        .message-header
+          .from = Rack::Utils.escape_html message['From']
+          .subject  = Rack::Utils.escape_html message['subject']
+          .date = Rack::Utils.escape_html message['Date'].split(' ').first(3).join(' ')
+        .message-content.collapse id="message-#{i}"
+          .from = Rack::Utils.escape_html message['From']
+          .to = message['To']
+          iframe.body
+
+- content_for :javascripts
+  javascript:
+    messages = #{@messages.to_json};
+    messages.forEach(function (m, i) {
+      var iframe = $(`#message-${i} iframe`)[0];
+      iframe.contentDocument.write(m['stripped-html']);
+      console.log(i, 'height', iframe.contentWindow.document.body.scrollHeight)
+      iframe.style.height = iframe.contentWindow.document.body.scrollHeight + 'px'
+    });
