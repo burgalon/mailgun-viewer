@@ -1,5 +1,4 @@
 require 'sinatra'
-require 'nokogiri'
 # require 'slim'
 require 'faraday'
 require 'json'
